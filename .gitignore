@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+.env
+.streamlit/secrets.toml
+traces/*.json
+traces/*.db
+*.db
+.DS_Store
