@@ -1,10 +1,12 @@
 # Breakpoint — failure forensics for AI pipelines
 
+FastAPI tracer for a 4-step document pipeline; walks spans backward to the first failing step (quoted evidence, SQLite + JSON traces).
+
 When a multi-step LLM pipeline fails, the last step is usually the one that *looks* broken. The actual error often entered two steps earlier. Breakpoint traces every step, then walks the trace backward to name the root-cause span — with the quoted input, output, and confidence that justify the call.
 
-It runs a 4-step document pipeline (intake → extraction → classification → summarization) behind FastAPI, stores every run as a JSON trace plus a SQLite index, and exposes a Streamlit explorer so you can paste a document, inspect spans, and diagnose a failure in one screen.
+It runs intake → extraction → classification → summarization behind FastAPI, stores every run as a JSON trace plus a SQLite index, and exposes a Streamlit explorer so you can paste a document, inspect spans, and diagnose a failure in one screen.
 
-**Correctly diagnosed the root-cause step in 8 / 8 deliberately-broken test runs** (trap keywords aimed at intake, extraction, classification, or summarization). 7 unit tests cover stub variation, SQLite commits, and that evidence quotes real span data rather than a generic “something went wrong.”
+I injected step-specific faults (trap keywords aimed at intake, extraction, classification, or summarization). The backward walk landed on the injected step in **8 / 8** of those runs. 7 unit tests cover stub variation, SQLite commits, and that evidence quotes real span data rather than a generic “something went wrong.”
 
 ## What I designed
 
