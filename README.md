@@ -44,6 +44,10 @@ Optional real LLM: copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` or 
 pytest -q
 ```
 
+## Deployment
+
+Breakpoint is two separate services on different domains: FastAPI (`main.py`) on Render, and the Streamlit explorer (`app.py`) on Streamlit Community Cloud. Deploy the backend from this repo (Render auto-detects `render.yaml`: `pip install -r requirements.txt`, then `uvicorn main:app --host 0.0.0.0 --port $PORT` on Python 3.11+). Then deploy `app.py` on Streamlit Cloud and set the secret `FORENSICS_API` to the public Render URL so the frontend talks to that API instead of localhost. Render's free tier spins down after inactivity, so the first request after a pause can take ~30 seconds to wake up.
+
 ## How to trigger a known failure
 
 Paste any of these into the explorer (or `POST /pipeline/run`) and hit **Diagnose**:
