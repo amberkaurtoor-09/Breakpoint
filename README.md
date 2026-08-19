@@ -37,6 +37,7 @@ streamlit run app.py
 
 - API docs: http://127.0.0.1:8000/docs
 - Explorer: http://localhost:8501
+- Backend API docs: [https://breakpoint-dkys.onrender.com/docs](https://breakpoint-dkys.onrender.com/docs)
 
 Optional real LLM: copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`.
 
