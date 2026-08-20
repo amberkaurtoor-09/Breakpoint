@@ -106,6 +106,9 @@ CUSTOM_CSS = """
 """
 
 
+WAKE_UP_MESSAGE = "Backend is waking up, please wait 30 seconds and refresh."
+
+
 def api_get(path: str):
     response = requests.get(f"{API_BASE}{path}", timeout=15)
     response.raise_for_status()
@@ -116,6 +119,13 @@ def api_post(path: str, payload: dict | None = None):
     response = requests.post(f"{API_BASE}{path}", json=payload or {}, timeout=30)
     response.raise_for_status()
     return response.json()
+
+
+def show_api_error(exc: BaseException, fallback: str) -> None:
+    if isinstance(exc, requests.Timeout) or "timed out" in str(exc).lower():
+        st.warning(WAKE_UP_MESSAGE)
+        return
+    st.error(fallback)
 
 
 def status_badge(status: str) -> str:
@@ -143,9 +153,10 @@ try:
 except requests.RequestException as exc:
     traces = []
     api_ok = False
-    st.error(
+    show_api_error(
+        exc,
         f"Cannot reach FastAPI at `{API_BASE}`. "
-        f"Start it with `uvicorn main:app --reload --port 8000`. ({exc})"
+        f"Start it with `uvicorn main:app --reload --port 8000`.",
     )
 
 with st.sidebar:
@@ -184,7 +195,7 @@ with left:
                 st.session_state["selected_trace"] = result["trace_id"]
                 st.rerun()
             except requests.RequestException as exc:
-                st.error(f"Pipeline request failed: {exc}")
+                show_api_error(exc, "Pipeline request failed.")
 
 with right:
     st.markdown('<div class="bp-section">Trace detail</div>', unsafe_allow_html=True)
@@ -199,7 +210,7 @@ with right:
         try:
             trace = api_get(f"/traces/{selected_id}")
         except requests.RequestException as exc:
-            st.error(f"Could not load trace: {exc}")
+            show_api_error(exc, "Could not load trace.")
             trace = None
 
         if trace:
@@ -235,7 +246,7 @@ with right:
                         "payload": api_post(f"/traces/{selected_id}/diagnose"),
                     }
                 except requests.RequestException as exc:
-                    st.error(f"Diagnose failed: {exc}")
+                    show_api_error(exc, "Diagnose failed.")
 
             stored = st.session_state.get("diagnosis") or {}
             if stored.get("trace_id") == selected_id:
